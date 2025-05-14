@@ -35,9 +35,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .meal-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
     gap: 10px;
+    flex-wrap: wrap;
     margin-top: 10px;
 }
 
@@ -45,17 +45,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border: 2px solid #87cefa;
     border-radius: 10px;
     padding: 15px;
-    margin: 10px 0;
+    margin: 10px 5px;
     background-color: #1b1f3a;
     box-shadow: 0 0 10px rgba(135, 206, 250, 0.3);
     display: flex;
     flex-direction: column;
-    flex: 0 0 auto;
-    min-width: 240px;
-    max-width: 400px;
-    width: 90vw;
-    min-height: 180px;
-    align-items: stretch;
+    flex: 1 1 200px;
+    min-width: 180px;
+    max-width: 300px;
+    min-height: 220px;
 }
 
 .meal-title {
