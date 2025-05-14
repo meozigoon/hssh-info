@@ -9,11 +9,34 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
+provider.setCustomParameters({
+    hd: 'hansung-sh.hs.kr'
+});
+
 // 버튼 엘리먼트 참조
 const loginBtn    = document.getElementById('login-btn');
 const signupBtn   = document.getElementById('signup-btn');
 const signoutBtn  = document.getElementById('signout-btn');
 const userEmailEl = document.getElementById('user-email');
+
+// 로그인 버튼 핸들러 (회원가입 버튼도 동일하게 provider 사용)
+loginBtn.addEventListener('click', () => {
+    auth.signInWithPopup(provider)
+        .catch(error => {
+            console.error(error);
+            alert('로그인 실패: ' + error.message);
+        });
+});
+signupBtn.addEventListener('click', () => {
+    auth.signInWithPopup(provider)
+        .then(() => {
+            alert('정상적으로 로그인되었습니다.');
+        })
+        .catch(error => {
+            console.error(error);
+            alert('회원가입 실패: ' + error.message);
+        });
+});
 
 // 로그인 상태 변경 감지
 auth.onAuthStateChanged(user => {
