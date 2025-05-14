@@ -1,113 +1,167 @@
+/* ─── 공통 설정 ─── */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 body {
-    background-color: #0a0f3c;
-    font-family: Arial, sans-serif;
-    color: #fdfdf5;
-    padding: 20px;
-    text-align: center;
+    background-color: #121625;
+    color: #ececec;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+}
+main {
+    padding: 100px 20px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-h1 {
-    color: #87cefa;
-    margin-bottom: 20px;
+/* ─── 헤더 ─── */
+header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background: #1f233e;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.header-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.logo {
+    position: absolute;
+    left: 24px;
+    height: 36px;
+    width: auto;
+}
+.site-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #72d1ff;
+}
+.header-right {
+    position: absolute;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.btn {
+    background-color: #72d1ff;
+    color: #1f233e;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.btn:hover {
+    background-color: #5bb8e6;
+}
+.user-email {
+    font-size: 0.85rem;
+    color: #ececec;
+    margin-left: 8px;
 }
 
+/* ─── 날짜 선택 ─── */
 .date-box {
-    margin-bottom: 20px;
-    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 24px;
+    font-size: 1rem;
 }
-
 input[type="date"] {
     padding: 6px 10px;
-    font-size: 16px;
-    border: 2px solid #87cefa;
+    font-size: 1rem;
+    border: 2px solid #72d1ff;
     border-radius: 6px;
-    background-color: #0a0f3c;
-    color: #fdfdf5;
+    background-color: #1f233e;
+    color: #ececec;
 }
-
-input[type="date"]::placeholder {
-    color: #87cefa;
-}
-
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(94%) sepia(6%) saturate(116%) hue-rotate(16deg) brightness(104%) contrast(104%);
 }
 
+/* ─── 급식 박스 ─── */
 .meal-container {
     display: flex;
-    justify-content: center;
-    gap: 10px;
     flex-wrap: wrap;
-    margin-top: 10px;
+    gap: 16px;
+    justify-content: center;
 }
-
 .meal-box {
-    border: 2px solid #87cefa;
+    flex: 1 1 240px;
+    background-color: #1f233e;
     border-radius: 10px;
-    padding: 15px;
-    margin: 10px 5px;
-    background-color: #1b1f3a;
-    box-shadow: 0 0 10px rgba(135, 206, 250, 0.3);
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     display: flex;
     flex-direction: column;
-    flex: 1 1 200px;
-    min-width: 180px;
-    max-width: 300px;
-    min-height: 220px;
 }
-
 .meal-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #fdfdf5;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #87cefa;
-    padding-bottom: 5px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #72d1ff;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #72d1ff;
+    padding-bottom: 6px;
 }
-
 .meal-content {
-    font-size: 16px;
-    line-height: 1.6;
-    white-space: pre-line;
-    color: #000000;
-    background-color: #f4f2e8;
-    padding: 12px;
+    flex: 1;
+    background: #ececec;
+    color: #1f233e;
+    padding: 14px;
     border-radius: 6px;
-    flex: 1 1 auto;
-    text-align: center;
-    box-sizing: border-box;
-    width: 100%;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    white-space: pre-line;
+    overflow-y: auto;
 }
-
 .allergy {
     color: #888;
-    font-size: 0.95em;
-    margin-left: 2px;
-    display: inline-block;
-    text-align: center;
+    font-size: 0.85rem;
 }
 
+/* ─── 알레르기 정보 박스 ─── */
 .allergy-info-box {
-    background: #f4f2e8;
-    color: #000;
+    background: #ececec;
+    color: #1f233e;
     border-radius: 10px;
-    padding: 18px 20px;
-    margin: 30px auto 0 auto;
-    max-width: 650px;
-    font-size: 16px;
-    box-shadow: 0 0 8px rgba(135, 206, 250, 0.15);
+    padding: 24px;
+    margin: 40px auto 0;
+    max-width: 700px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-
 .allergy-info-box h2 {
-    color: #1b1f3a;
-    font-size: 18px;
-    margin-top: 0;
-    margin-bottom: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
 }
-
 .allergy-info-box ul {
     list-style: none;
-    padding: 0;
-    margin: 0;
     text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* ─── 푸터 ─── */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #1f233e;
+    color: #888;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 0.85rem;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
 }
