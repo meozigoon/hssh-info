@@ -41,7 +41,7 @@ function fetchAndDisplayMeal() {
             };
 
             for (const key of Object.values(meals)) {
-                document.getElementById(key).innerHTML = '없음';
+                document.getElementById(key).innerHTML = '급식 정보 없음';
             }
 
             const mealData = data?.mealServiceDietInfo?.[1]?.row || [];
