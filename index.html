@@ -2,7 +2,7 @@
 <html lang="ko">
     <head>
         <meta charset="UTF-8" />
-        <title>한성과학고 급식 정보</title>
+        <title>한성과학고 정보</title>
         <link rel="stylesheet" href="style.css" />
         <link rel="icon" href="/image/hssh_Logo.png" type="image/x-icon" />
 
@@ -14,7 +14,7 @@
         <header>
             <div class="header-container">
                 <img src="/image/hssh_Logo.png" alt="로고" class="logo" />
-                <span class="site-title">한성과학고 급식</span>
+                <span class="site-title">한성과학고 정보</span>
                 <div class="header-right">
                     <button id="login-btn" class="btn">로그인</button>
                     <button id="signup-btn" class="btn">회원가입</button>
@@ -27,44 +27,65 @@
         </header>
 
         <main>
-            <div class="date-box">
-                <label for="meal-date">날짜 선택:&nbsp;</label>
-                <input type="date" id="meal-date" />
-            </div>
+            <section>
+                <h1 style="text-align: center">급식 정보</h1>
+                <br />
+                <div class="date-box">
+                    <!--<label for="meal-date">날짜 선택:&nbsp;</label>-->
+                    <input type="date" id="meal-date" />
+                </div>
 
-            <div class="meal-container">
-                <div class="meal-box">
-                    <div class="meal-title">아침</div>
-                    <div class="meal-content" id="breakfast">
-                        날짜를 선택하세요
+                <div class="meal-container">
+                    <div class="meal-box">
+                        <div class="meal-title">아침</div>
+                        <div class="meal-content" id="breakfast">
+                            날짜를 선택하세요
+                        </div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title">점심</div>
+                        <div class="meal-content" id="lunch">
+                            날짜를 선택하세요
+                        </div>
+                    </div>
+                    <div class="meal-box">
+                        <div class="meal-title">저녁</div>
+                        <div class="meal-content" id="dinner">
+                            날짜를 선택하세요
+                        </div>
                     </div>
                 </div>
-                <div class="meal-box">
-                    <div class="meal-title">점심</div>
-                    <div class="meal-content" id="lunch">날짜를 선택하세요</div>
-                </div>
-                <div class="meal-box">
-                    <div class="meal-title">저녁</div>
-                    <div class="meal-content" id="dinner">
-                        날짜를 선택하세요
-                    </div>
-                </div>
-            </div>
 
-            <div class="allergy-info-box">
-                <h2>알레르기 유발 식재료 번호</h2>
-                <ul>
-                    <li>
-                        1. 난류(계란) 2. 우유 3. 메밀 4. 땅콩 5. 대두 6. 밀 7.
-                        고등어 8. 게 9. 새우 10. 돼지고기
-                    </li>
-                    <li>
-                        11. 복숭아 12. 토마토 13. 아황산류 14. 호두 15. 닭고기
-                        16. 쇠고기 17. 오징어 18. 조개류(굴, 전복, 홍합 포함)
-                        19. 잣
-                    </li>
+                <div class="allergy-info-box">
+                    <h2>알레르기 유발 식재료 번호</h2>
+                    <ul>
+                        <li>
+                            1. 난류(계란) 2. 우유 3. 메밀 4. 땅콩 5. 대두 6. 밀
+                            7. 고등어 8. 게 9. 새우 10. 돼지고기
+                        </li>
+                        <li>
+                            11. 복숭아 12. 토마토 13. 아황산류 14. 호두 15.
+                            닭고기 16. 쇠고기 17. 오징어 18. 조개류(굴, 전복,
+                            홍합 포함) 19. 잣
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <br />
+                <br />
+                <h2>학교 행사 정보</h2>
+                <br />
+                <div>
+                    <input type="month" id="event-month" />
+                </div>
+                <br />
+                <div id="event-calendar"></div>
+                <ul id="event-list">
+                    <!-- 행사 목록이 표시될 곳 -->
                 </ul>
-            </div>
+            </section>
         </main>
 
         <footer>
