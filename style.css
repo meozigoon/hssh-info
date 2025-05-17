@@ -29,20 +29,16 @@ header {
 }
 
 .header-container {
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 12px 24px;
-    max-width: 1200px;
-    margin: 0 auto;
 }
 
 .logo {
     position: absolute;
     left: 24px;
     height: 36px;
-    width: auto;
 }
 
 .site-title {
@@ -55,7 +51,6 @@ header {
     position: absolute;
     right: 24px;
     display: flex;
-    align-items: center;
     gap: 10px;
 }
 
@@ -76,7 +71,6 @@ header {
 
 .user-email {
     font-size: 0.85rem;
-    color: #ececec;
     margin-left: 8px;
 }
 
@@ -85,11 +79,12 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 auto 24px;
-    font-size: 1rem;
+    gap: 8px;
+    margin: 24px auto;
 }
 
-input[type="date"] {
+input[type="date"],
+input[type="month"] {
     padding: 6px 10px;
     font-size: 1rem;
     border: 2px solid #72d1ff;
@@ -98,44 +93,8 @@ input[type="date"] {
     color: #ececec;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+input::-webkit-calendar-picker-indicator {
     filter: invert(94%) sepia(6%) saturate(116%) hue-rotate(16deg) brightness(104%) contrast(104%);
-}
-
-section > div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-section > div > input[type="month"] {
-    padding: 6px 10px;
-    font-size: 1rem;
-    border: 2px solid #72d1ff;
-    border-radius: 6px;
-    background-color: #1f233e;
-    color: #ececec;
-    margin-right: 8px;
-}
-
-section > div > input[type="month"]::-webkit-calendar-picker-indicator {
-    filter: invert(94%) sepia(6%) saturate(116%) hue-rotate(16deg) brightness(104%) contrast(104%);
-}
-
-section > div > button {
-    background-color: #72d1ff;
-    color: #1f233e;
-    border: none;
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-section > div > button:hover {
-    background-color: #5bb8e6;
 }
 
 /* ─── 급식 박스 ─── */
@@ -152,8 +111,6 @@ section > div > button:hover {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    display: flex;
-    flex-direction: column;
 }
 
 .meal-title {
@@ -166,13 +123,11 @@ section > div > button:hover {
 }
 
 .meal-content {
-    flex: 1;
     background: #ececec;
     color: #1f233e;
     padding: 14px;
     border-radius: 6px;
     font-size: 0.95rem;
-    line-height: 1.4;
     white-space: pre-line;
     overflow-y: auto;
 }
@@ -182,42 +137,32 @@ section > div > button:hover {
     font-size: 0.85rem;
 }
 
-/* ─── 알레르기 정보 박스 ─── */
+/* ─── 알레르기 정보 ─── */
 .allergy-info-box {
     background: #ececec;
     color: #1f233e;
     border-radius: 10px;
     padding: 24px;
-    margin: 40px auto 0;
+    margin: 40px auto;
     max-width: 700px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.allergy-info-box h2 {
-    font-size: 1.1rem;
-    margin-bottom: 12px;
-}
-
 .allergy-info-box ul {
     list-style: none;
-    text-align: left;
-    font-size: 0.95rem;
     line-height: 1.4;
 }
 
 /* ─── 학사일정 달력 스타일 ─── */
 #event-calendar {
-    display: block;
     width: 100vw;
-    position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
     overflow-x: auto;
-    min-height: 120px;
     background: transparent;
-    z-index: 1;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 #event-calendar table.event-calendar-table {
@@ -226,26 +171,57 @@ section > div > button:hover {
     margin: 0 auto;
     border-collapse: collapse;
     text-align: center;
-    background: #fff;
-    color: #222;
+    background: transparent;
+    color: #ececec;
     font-size: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    table-layout: fixed;
-}
-
-#event-calendar th, #event-calendar td {
-    min-width: 180px;
-    height: 80px;
-    padding: 8px 4px;
-    background: #f4f2e8;
-    color: #222;
-    font-size: 1rem;
-    word-break: break-all;
 }
 
 #event-calendar th {
-    background: #72d1ff;
+    background-color: #72d1ff;
     color: #1f233e;
+    padding: 8px 4px;
+    border: 1px solid #3a3f5a;
+}
+
+#event-calendar td {
+    width: 14.28%;
+    height: 80px;
+    padding: 8px 4px;
+    background-color: #2a2e4a;
+    color: #ececec;
+    border: 1px solid #3a3f5a;
+    vertical-align: top;
+    position: relative;
+}
+
+/* 오늘 날짜 강조 (주황색) */
+#event-calendar td.today {
+    border: 2px solid #ffcd3c;
+}
+
+/* 행사명 */
+#event-calendar td div {
+    margin-top: 4px;
+    font-size: 0.85em;
+}
+
+/* ─── 행사 토글 버튼 ─── */
+#toggle-events-btn {
+    display: block;
+    margin: 16px auto;
+}
+
+/* ─── 행사 목록 ─── */
+#event-list {
+    display: none;
+    list-style: none;
+    margin: 16px auto;
+    max-width: 1200px;
+    color: #ececec;
+}
+
+#event-list li {
+    margin-bottom: 8px;
 }
 
 /* ─── 푸터 ─── */
@@ -258,10 +234,11 @@ footer {
     color: #888;
     text-align: center;
     padding: 10px 0;
-    font-size: 0.85rem;
     box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
 }
 
+/* 제목 중앙 정렬 */
 section > h2 {
     text-align: center;
+    margin-top: 40px;
 }

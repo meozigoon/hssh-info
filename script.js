@@ -3,28 +3,24 @@ const firebaseConfig = {
     apiKey: "AIzaSyAvdeqqvTeRv_xLGW7CKllR156ZrXP45-g",
     authDomain: "hssh-meal.firebaseapp.com",
     projectId: "hssh-meal",
-    };
+};
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
-
-// ✨ Google 팝업 단계에서 hansung-sh.hs.kr만 선택 가능하도록 제한
 provider.setCustomParameters({ hd: 'hansung-sh.hs.kr' });
 
-// 버튼 참조
 const loginBtn    = document.getElementById('login-btn');
 const signupBtn   = document.getElementById('signup-btn');
 const signoutBtn  = document.getElementById('signout-btn');
 const userEmailEl = document.getElementById('user-email');
 
-// 로그인 상태 변동 감지
 auth.onAuthStateChanged(user => {
     if (user) {
         userEmailEl.textContent = user.email;
-        loginBtn.style.display    = 'none';
-        signupBtn.style.display   = 'none';
-        signoutBtn.style.display  = 'inline-block';
+        loginBtn.style.display   = 'none';
+        signupBtn.style.display  = 'none';
+        signoutBtn.style.display = 'inline-block';
     } else {
         userEmailEl.textContent   = '';
         loginBtn.style.display    = 'inline-block';
@@ -33,18 +29,12 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-// 공통 로그인/회원가입 핸들러
 function signIn() {
     auth.signInWithPopup(provider)
         .then(result => {
             const email = result.user.email;
-            // 도메인 재확인: 혹시 bypass 될 경우 삭제
-            if (email.endsWith('@hansung-sh.hs.kr')) {
-                // 정상 로그인
-            } else {
-                // Firebase에 추가된 계정 즉시 삭제
-                auth.currentUser.delete()
-                    .catch(err => console.error('계정 삭제 실패:', err));
+            if (!email.endsWith('@hansung-sh.hs.kr')) {
+                auth.currentUser.delete().catch(err => console.error('계정 삭제 실패:', err));
                 auth.signOut();
                 alert('한성과학고(@hansung-sh.hs.kr) 계정만 로그인 가능합니다.');
             }
@@ -55,16 +45,13 @@ function signIn() {
         });
 }
 
-// 로그인
 loginBtn.addEventListener('click', signIn);
-// 회원가입
 signupBtn.addEventListener('click', signIn);
-// 로그아웃
 signoutBtn.addEventListener('click', () => auth.signOut());
+
 
 // ===== 급식 정보 로딩 =====
 const dateInput = document.getElementById('meal-date');
-
 function setTodayToInput(input) {
     const now = new Date();
     let yyyy = now.getFullYear();
@@ -82,12 +69,15 @@ setTodayToInput(dateInput);
 
 function fetchAndDisplayMeal() {
     const sel = new Date(dateInput.value);
-    const y = sel.getFullYear(), m = String(sel.getMonth()+1).padStart(2,'0'), d = String(sel.getDate()).padStart(2,'0');
+    const y = sel.getFullYear(),
+          m = String(sel.getMonth()+1).padStart(2,'0'),
+          d = String(sel.getDate()).padStart(2,'0');
     const dateString = `${y}${m}${d}`;
     const apiKey = 'b9051bf44db6484e8e82f71c8c422100';
     const proxy  = 'https://corsproxy.io/?';
     const url    = proxy + encodeURIComponent(
-        `https://open.neis.go.kr/hub/mealServiceDietInfo?ATPT_OFCDC_SC_CODE=B10&SD_SCHUL_CODE=7010115&MLSV_YMD=${dateString}&Type=json&Key=${apiKey}`
+        `https://open.neis.go.kr/hub/mealServiceDietInfo?ATPT_OFCDC_SC_CODE=B10` +
+        `&SD_SCHUL_CODE=7010115&MLSV_YMD=${dateString}&Type=json&Key=${apiKey}`
     );
     fetch(url)
         .then(r => r.json())
@@ -96,7 +86,8 @@ function fetchAndDisplayMeal() {
             Object.values(meals).forEach(id => document.getElementById(id).innerHTML = '급식 정보 없음');
             const rows = data?.mealServiceDietInfo?.[1]?.row || [];
             rows.forEach(item => {
-                const t = parseInt(item.MMEAL_SC_CODE), raw = item.DDISH_NM;
+                const t   = parseInt(item.MMEAL_SC_CODE, 10);
+                const raw = item.DDISH_NM;
                 const formatted = raw
                     .split(/<br\s*\/?>/gi)
                     .map(line => line.replace(/\(([^)]+)\)/g,'<span class="allergy">($1)</span>'))
@@ -114,124 +105,103 @@ function fetchAndDisplayMeal() {
 dateInput.addEventListener('change', fetchAndDisplayMeal);
 window.addEventListener('DOMContentLoaded', fetchAndDisplayMeal);
 
-// ===== 학교 행사 정보 =====
-// API 기본 정보
-const eventApiKey = '2d4a22c414504fe9ba434a810d3c64f1'; // 자신의 API 키 입력
-const schoolCode = '7010115'; // 한성과학고등학교 학교 코드 (예시)
 
-// 페이지 로드 시 event-month input을 오늘 날짜의 년월로 설정하고, 바로 행사 목록도 보여줌
+// ===== 학교 행사 정보 =====
+const eventApiKey = '2d4a22c414504fe9ba434a810d3c64f1';
+const schoolCode  = '7010115';
+
 window.addEventListener('DOMContentLoaded', () => {
     const eventMonthInput = document.getElementById('event-month');
-    if (eventMonthInput) {
-        const now = new Date();
-        const yyyy = now.getFullYear();
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        eventMonthInput.value = `${yyyy}-${mm}`;
-        // 바로 행사 목록 표시
-        if (typeof fetchAndDisplayEvents === 'function') {
-            fetchAndDisplayEvents();
-        }
-        eventMonthInput.addEventListener('change', fetchAndDisplayEvents);
-    }
+    const toggleBtn       = document.getElementById('toggle-events-btn');
+    const eventList       = document.getElementById('event-list');
+    if (!eventMonthInput || !toggleBtn) return;
+
+    // 오늘 기준 연·월 설정
+    const now = new Date();
+    eventMonthInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+    // 초기 데이터 로드
+    fetchAndDisplayEvents();
+
+    // 행사 목록 토글
+    toggleBtn.addEventListener('click', () => {
+        const isVisible = eventList.style.display === 'block';
+        eventList.style.display = isVisible ? 'none' : 'block';
+        toggleBtn.textContent   = isVisible ? '행사 목록 보기' : '행사 목록 숨기기';
+    });
+
+    // 월 변경 시 재조회
+    eventMonthInput.addEventListener('change', fetchAndDisplayEvents);
 });
 
-// 행사 정보를 가져오는 함수
 async function fetchSchoolEvents(year, month) {
     const proxy = 'https://corsproxy.io/?';
+    // AA_YMD 파라미터로 선택된 연월만 서버에서 필터링
     const url = proxy + encodeURIComponent(
-        `https://open.neis.go.kr/hub/SchoolSchedule?` +
-        `Key=${eventApiKey}&Type=json&ATPT_OFCDC_SC_CODE=B10&SD_SCHUL_CODE=7010115` +
+        `https://open.neis.go.kr/hub/SchoolSchedule?Key=${eventApiKey}` +
+        `&Type=json&ATPT_OFCDC_SC_CODE=B10&SD_SCHUL_CODE=${schoolCode}` +
         `&AA_YMD=${year}${month}`
     );
-
     try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.SchoolSchedule && data.SchoolSchedule[1].row) {
-            return data.SchoolSchedule[1].row;
-        } else {
-            return [];
-        }
-    } catch (error) {
-        console.error('행사 데이터를 가져오는 중 오류 발생:', error);
+        const res  = await fetch(url);
+        const data = await res.json();
+        // API 응답 구조에 맞춰 반환
+        return data?.SchoolSchedule?.[1]?.row || [];
+    } catch (err) {
+        console.error('행사 데이터 로딩 실패:', err);
         return [];
     }
 }
 
-// 달력 생성 및 행사 표시 함수
 function renderEventCalendar(year, month, events) {
     const calendarDiv = document.getElementById('event-calendar');
     calendarDiv.innerHTML = '';
     const firstDay = new Date(year, month - 1, 1);
-    const lastDay = new Date(year, month, 0);
+    const lastDate = new Date(year, month, 0).getDate();
     const startDay = firstDay.getDay();
-    const totalDays = lastDay.getDate();
-    // 행사 정보를 날짜별로 매핑
-    const eventMap = {};
-    events.forEach(ev => {
-        const day = parseInt(ev.AA_YMD.slice(6, 8), 10);
-        if (!eventMap[day]) eventMap[day] = [];
-        eventMap[day].push(ev.EVENT_NM);
-    });
+    const today    = new Date();
+    const todayY   = today.getFullYear();
+    const todayM   = today.getMonth() + 1;
+    const todayD   = today.getDate();
+    let day        = 1;
+
     let html = '<table class="event-calendar-table">';
-    html += '<thead><tr style="background:#72d1ff;color:#1f233e;"><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead><tbody>';
-    let day = 1;
+    html += '<thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead><tbody>';
     for (let i = 0; i < 6; i++) {
         html += '<tr>';
         for (let j = 0; j < 7; j++) {
-            if ((i === 0 && j < startDay) || day > totalDays) {
-                html += '<td style="background:#f4f2e8;"></td>';
+            if ((i === 0 && j < startDay) || day > lastDate) {
+                html += '<td></td>';
             } else {
-                html += `<td style="vertical-align:top;padding:4px 2px 8px 2px;min-width:36px;min-height:48px;border:1px solid #e0e0e0;">
-                    <div style="font-weight:bold;">${day}</div>`;
-                if (eventMap[day]) {
-                    eventMap[day].forEach(evName => {
-                        html += `<div style="background:#72d1ff;color:#1f233e;border-radius:4px;padding:2px 3px;margin:2px 0;font-size:0.85em;">${evName}</div>`;
-                    });
-                }
+                const isToday = (year === todayY && month === todayM && day === todayD);
+                html += `<td${isToday ? ' class="today"' : ''}><div style="font-weight:bold;">${day}</div>`;
+                (events.filter(ev => parseInt(ev.AA_YMD.slice(6,8),10) === day) || []).forEach(ev => {
+                    html += `<div style="background:#72d1ff;color:#1f233e;border-radius:4px;padding:2px 3px;margin-top:4px;font-size:0.85em;">${ev.EVENT_NM}</div>`;
+                });
                 html += '</td>';
                 day++;
             }
         }
         html += '</tr>';
-        if (day > totalDays) break;
+        if (day > lastDate) break;
     }
     html += '</tbody></table>';
     calendarDiv.innerHTML = html;
 }
 
-// 행사 정보를 화면에 표시하는 함수
 async function fetchAndDisplayEvents() {
-    const eventList = document.getElementById('event-list');
-    eventList.innerHTML = ''; // 기존 목록 초기화
-
-    const selectedMonth = document.getElementById('event-month').value;
-    if (!selectedMonth) {
-        alert('조회할 년월을 선택해주세요.');
-        return;
-    }
-
-    const [year, month] = selectedMonth.split('-');
-    const events = await fetchSchoolEvents(year, month);
-
+    const listEl       = document.getElementById('event-list');
+    listEl.innerHTML   = '';
+    const [year, month] = document.getElementById('event-month').value.split('-');
+    const events        = await fetchSchoolEvents(year, month);
     renderEventCalendar(parseInt(year), parseInt(month), events);
-
     if (events.length === 0) {
-        eventList.innerHTML = '<li>해당 월에는 등록된 행사가 없습니다.</li>';
-        return;
+        listEl.innerHTML = '<li>해당 월에는 등록된 행사가 없습니다.</li>';
+    } else {
+        events.forEach(ev => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="event-date">${ev.AA_YMD.slice(0,4)}년 ${ev.AA_YMD.slice(4,6)}월 ${ev.AA_YMD.slice(6,8)}일</span> - ${ev.EVENT_NM}`;
+            listEl.appendChild(li);
+        });
     }
-
-    events.forEach(event => {
-        const eventItem = document.createElement('li');
-        eventItem.innerHTML = `
-            <span class="event-date">${formatDate(event.AA_YMD)}</span> - ${event.EVENT_NM}
-        `;
-        eventList.appendChild(eventItem);
-    });
-}
-
-// 날짜 포매팅 (YYYYMMDD -> YYYY년 MM월 DD일)
-function formatDate(ymd) {
-    return `${ymd.substring(0, 4)}년 ${ymd.substring(4, 6)}월 ${ymd.substring(6, 8)}일`;
 }

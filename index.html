@@ -29,12 +29,9 @@
         <main>
             <section>
                 <h1 style="text-align: center">급식 정보</h1>
-                <br />
                 <div class="date-box">
-                    <!--<label for="meal-date">날짜 선택:&nbsp;</label>-->
                     <input type="date" id="meal-date" />
                 </div>
-
                 <div class="meal-container">
                     <div class="meal-box">
                         <div class="meal-title">아침</div>
@@ -55,7 +52,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="allergy-info-box">
                     <h2>알레르기 유발 식재료 번호</h2>
                     <ul>
@@ -66,24 +62,23 @@
                         <li>
                             11. 복숭아 12. 토마토 13. 아황산류 14. 호두 15.
                             닭고기 16. 쇠고기 17. 오징어 18. 조개류(굴, 전복,
-                            홍합 포함) 19. 잣
+                            홍합) 19. 잣
                         </li>
                     </ul>
                 </div>
             </section>
 
             <section>
-                <br />
-                <br />
                 <h2>학교 행사 정보</h2>
-                <br />
-                <div>
+                <div class="date-box">
                     <input type="month" id="event-month" />
                 </div>
-                <br />
                 <div id="event-calendar"></div>
+                <button id="toggle-events-btn" class="btn">
+                    행사 목록 보기
+                </button>
                 <ul id="event-list">
-                    <!-- 행사 목록이 표시될 곳 -->
+                    <!-- 토글 버튼으로 보이/숨김 -->
                 </ul>
             </section>
         </main>
