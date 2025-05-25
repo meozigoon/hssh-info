@@ -120,6 +120,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const now = new Date();
     eventMonthInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
+    // 행사 목록 기본적으로 보이기
+    eventList.style.display = 'block';
+    toggleBtn.textContent   = '행사 목록 숨기기';
+
     // 초기 데이터 로드
     fetchAndDisplayEvents();
 
@@ -136,17 +140,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
 async function fetchSchoolEvents(year, month) {
     const proxy = 'https://corsproxy.io/?';
-    // AA_YMD 파라미터로 선택된 연월만 서버에서 필터링
+    const monthStr = String(month).padStart(2, '0');
     const url = proxy + encodeURIComponent(
         `https://open.neis.go.kr/hub/SchoolSchedule?Key=${eventApiKey}` +
         `&Type=json&ATPT_OFCDC_SC_CODE=B10&SD_SCHUL_CODE=${schoolCode}` +
-        `&AA_YMD=${year}${month}`
+        `&AA_YMD=${year}${monthStr}`
     );
     try {
         const res  = await fetch(url);
         const data = await res.json();
-        // API 응답 구조에 맞춰 반환
-        return data?.SchoolSchedule?.[1]?.row || [];
+        // 해당 월의 일정만 필터링
+        const rows = data?.SchoolSchedule?.[1]?.row || [];
+        return rows.filter(ev => ev.AA_YMD && ev.AA_YMD.startsWith(`${year}${monthStr}`) && ev.EVENT_NM && ev.EVENT_NM.trim() !== '');
     } catch (err) {
         console.error('행사 데이터 로딩 실패:', err);
         return [];
