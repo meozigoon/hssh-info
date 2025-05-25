@@ -2,7 +2,17 @@
 // 내 정보 이메일/이미지/로그아웃 표시
 function renderMypageUserBox(user) {
     const box = document.getElementById("mypage-userbox");
+    const infoArea = document.getElementById("mypage-account-info");
     if (user) {
+        // 상단 계정 정보(이름, 사진) 표시
+        if (infoArea) {
+            infoArea.innerHTML = `
+                <img src="${user.photoURL || '/image/hssh_Logo.png'}" alt="프로필" style="width:56px;height:56px;border-radius:50%;background:#ececec;object-fit:cover;margin-bottom:8px;" />
+                <div style="font-size:1.1rem;font-weight:600;color:#72d1ff;margin-top:6px;">${user.displayName || user.email}</div>
+                <div style="font-size:0.98rem;color:#ececec;margin-top:2px;">${user.email}</div>
+            `;
+        }
+        // 기존 하단 계정 정보(이메일+로그아웃)
         box.innerHTML = `<span class="user-email" style="text-decoration:underline;text-underline-position:under;color:#72d1ff;cursor:pointer;gap:6px;display:flex;align-items:center;">
             <img src="${user.photoURL || "/image/hssh_Logo.png"}" alt="프로필" style="width:28px;height:28px;border-radius:50%;background:#ececec;object-fit:cover;margin-right:4px;" />
             ${user.email}
@@ -13,6 +23,7 @@ function renderMypageUserBox(user) {
         };
         box.style.display = 'flex';
     } else {
+        if (infoArea) infoArea.innerHTML = '';
         box.innerHTML = "";
         box.style.display = 'none';
     }
@@ -46,12 +57,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 signoutBtn.style.display = 'none';
             }
         }
-        // 헤더 버튼 이벤트
+        // 헤더 버튼 이벤트 (script.js와 동일하게)
         document.getElementById('login-btn').onclick = function() {
-            if (window.signIn) window.signIn();
+            if (window.signIn) {
+                window.signIn();
+            } else if (window.auth && window.provider) {
+                window.auth.signInWithPopup(window.provider)
+                    .then(result => {
+                        const email = result.user.email;
+                        if (!email.endsWith('@hansung-sh.hs.kr')) {
+                            window.auth.currentUser.delete().catch(err => console.error('계정 삭제 실패:', err));
+                            window.auth.signOut();
+                            alert('한성과학고(@hansung-sh.hs.kr) 계정만 로그인 가능합니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('인증 실패:', error);
+                        alert('인증 실패: ' + error.message);
+                    });
+            }
         };
         document.getElementById('signout-btn').onclick = function() {
-            if (window.auth) window.auth.signOut().then(()=>window.location.href='/');
+            if (window.auth) window.auth.signOut();
         };
         document.getElementById('user-email').onclick = function() {
             if (window.auth && window.auth.currentUser) {
