@@ -110,40 +110,39 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         };
         // 계정 삭제 버튼 이벤트
-        document
-            .getElementById("delete-account-btn")
-            .addEventListener("click", function () {
-                if (window.auth && window.auth.currentUser) {
-                    if (
-                        confirm(
-                            "정말로 계정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다."
-                        )
-                    ) {
-                        window.auth.currentUser
-                            .delete()
-                            .then(function () {
-                                alert("계정이 삭제되었습니다.");
+        document.getElementById("delete-account-btn").addEventListener("click", function () {
+            if (window.auth && window.auth.currentUser) {
+                if (
+                    confirm(
+                        "정말로 계정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다."
+                    )
+                ) {
+                    window.auth.currentUser
+                        .delete()
+                        .then(function () {
+                            alert("계정이 삭제되었습니다. 로그아웃됩니다.");
+                            window.auth.signOut().then(function() {
                                 window.location.href = "/";
-                            })
-                            .catch(function (error) {
-                                if (
-                                    error.code ===
-                                    "auth/requires-recent-login"
-                                ) {
-                                    alert(
-                                        "보안을 위해 다시 로그인 후 계정 삭제를 시도해 주세요."
-                                    );
-                                    window.location.href = "/";
-                                } else {
-                                    alert(
-                                        "계정 삭제 실패: " +
-                                            error.message
-                                    );
-                                }
                             });
-                    }
+                        })
+                        .catch(function (error) {
+                            if (
+                                error.code ===
+                                "auth/requires-recent-login"
+                            ) {
+                                alert(
+                                    "보안을 위해 다시 로그인 후 계정 삭제를 시도해 주세요."
+                                );
+                                window.location.href = "/";
+                            } else {
+                                alert(
+                                    "계정 삭제 실패: " + error.message
+                                );
+                            }
+                        });
                 }
-            });
+            }
+        });
     }
     waitForAuthAndInit();
 });
