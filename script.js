@@ -18,12 +18,13 @@ const userEmailEl = document.getElementById('user-email');
 
 auth.onAuthStateChanged(user => {
     if (user) {
-        userEmailEl.textContent = user.email;
+        // 프로필 이미지와 이메일 함께 표시
+        userEmailEl.innerHTML = `<img src="${user.photoURL || '/image/hssh_Logo.png'}" alt="프로필" />${user.email}`;
         loginBtn.style.display   = 'none';
         // signupBtn.style.display  = 'none';
         signoutBtn.style.display = 'inline-block';
     } else {
-        userEmailEl.textContent   = '';
+        userEmailEl.innerHTML      = '';
         loginBtn.style.display    = 'inline-block';
         // signupBtn.style.display   = 'inline-block';
         signoutBtn.style.display  = 'none';
@@ -49,7 +50,11 @@ function signIn() {
 loginBtn.addEventListener('click', signIn);
 // signupBtn.addEventListener('click', signIn);
 signoutBtn.addEventListener('click', () => auth.signOut());
-
+userEmailEl.addEventListener('click', () => {
+    if (auth.currentUser) {
+        window.location.href = '/mypage.html';
+    }
+});
 
 // ===== 급식 정보 로딩 =====
 const dateInput = document.getElementById('meal-date');
@@ -211,3 +216,19 @@ async function fetchAndDisplayEvents() {
         });
     }
 }
+
+// 로그인 상태가 아니면 mypage.html 접근 시 첫 페이지로 리다이렉트
+if (window.location.pathname.endsWith('/mypage.html')) {
+    auth.onAuthStateChanged(user => {
+        if (!user) {
+            window.location.href = '/';
+        }
+    });
+}
+
+document.querySelectorAll('.logo').forEach(function(logo) {
+    logo.style.cursor = 'pointer';
+    logo.addEventListener('click', function() {
+        window.location.href = '/';
+    });
+});

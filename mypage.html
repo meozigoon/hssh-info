@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <title>내 정보 - 한성과학고</title>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="icon" href="/image/hssh_Logo.png" type="image/x-icon" />
+    </head>
+    <body>
+        <header>
+            <div class="header-container">
+                <img src="/image/hssh_Logo.png" alt="로고" class="logo" />
+                <span class="site-title">한성과학고 정보</span>
+                <div class="header-right">
+                    <button id="login-btn" class="btn">로그인</button>
+                    <span id="user-email" class="user-email"></span>
+                    <button id="signout-btn" class="btn" style="display: none">
+                        로그아웃
+                    </button>
+                </div>
+            </div>
+        </header>
+        <main>
+            <section style="max-width: 400px; margin: 60px auto 0">
+                <h2 style="text-align: center">내 정보</h2>
+                <div
+                    class="user-info-box"
+                    style="
+                        background: #1f233e;
+                        padding: 32px 24px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+                        margin-top: 32px;
+                        text-align: center;
+                    "
+                >
+                    <div
+                        id="mypage-userbox"
+                        style="
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 12px;
+                            margin-bottom: 24px;
+                        "
+                    ></div>
+                    <button
+                        id="delete-account-btn"
+                        class="btn"
+                        style="background: #ff4d4f; color: #fff"
+                    >
+                        계정 삭제
+                    </button>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>© 2025 이동하. All Rights Reserved.</p>
+        </footer>
+        <script src="script.js"></script>
+        <script src="mypage.js"></script>
+    </body>
+</html>

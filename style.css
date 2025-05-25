@@ -83,6 +83,20 @@ header {
     align-items: center;
     justify-content: center;
     height: 36px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-position: under;
+    color: #72d1ff;
+    gap: 6px;
+}
+
+.user-email img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin-right: 4px;
+    background: #ececec;
+    object-fit: cover;
 }
 
 #login-btn {
