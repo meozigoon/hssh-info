@@ -11,7 +11,8 @@ const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ hd: 'hansung-sh.hs.kr' });
 
 const loginBtn    = document.getElementById('login-btn');
-const signupBtn   = document.getElementById('signup-btn');
+// 회원가입 버튼 제거
+// const signupBtn   = document.getElementById('signup-btn');
 const signoutBtn  = document.getElementById('signout-btn');
 const userEmailEl = document.getElementById('user-email');
 
@@ -19,12 +20,12 @@ auth.onAuthStateChanged(user => {
     if (user) {
         userEmailEl.textContent = user.email;
         loginBtn.style.display   = 'none';
-        signupBtn.style.display  = 'none';
+        // signupBtn.style.display  = 'none';
         signoutBtn.style.display = 'inline-block';
     } else {
         userEmailEl.textContent   = '';
         loginBtn.style.display    = 'inline-block';
-        signupBtn.style.display   = 'inline-block';
+        // signupBtn.style.display   = 'inline-block';
         signoutBtn.style.display  = 'none';
     }
 });
@@ -46,7 +47,7 @@ function signIn() {
 }
 
 loginBtn.addEventListener('click', signIn);
-signupBtn.addEventListener('click', signIn);
+// signupBtn.addEventListener('click', signIn);
 signoutBtn.addEventListener('click', () => auth.signOut());
 
 

@@ -53,6 +53,8 @@ header {
     display: flex;
     gap: 10px;
     align-items: center;
+    justify-content: flex-end;
+    min-width: 250px;
 }
 
 .btn {
@@ -81,6 +83,18 @@ header {
     align-items: center;
     justify-content: center;
     height: 36px;
+}
+
+#login-btn {
+    order: 2;
+    margin-left: 0;
+    margin-right: 0;
+}
+#user-email {
+    order: 1;
+}
+#signout-btn {
+    order: 3;
 }
 
 /* ─── 날짜 선택 ─── */
