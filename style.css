@@ -279,3 +279,59 @@ section > h2 {
     text-align: center;
     margin-top: 40px;
 }
+
+/* ─── 마이페이지 계정 정보 스타일 ─── */
+#mypage-account-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 24px;
+    margin-bottom: 12px;
+}
+#mypage-account-info img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #ececec;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+#mypage-account-info .mypage-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #72d1ff;
+    margin-top: 6px;
+}
+#mypage-account-info .mypage-email {
+    font-size: 0.98rem;
+    color: #ececec;
+    margin-top: 2px;
+}
+.user-info-box {
+    background: #1f233e;
+    padding: 32px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    margin-top: 12px;
+    text-align: center;
+}
+#mypage-userbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+#mypage-signout-btn {
+    margin-left: 10px;
+}
+#delete-account-btn {
+    background: #ff4d4f;
+    color: #fff;
+    margin-top: 8px;
+    transition: background 0.2s;
+}
+#delete-account-btn:hover {
+    background: #d9363e;
+}

@@ -6,6 +6,7 @@ function renderMypageUserBox(user) {
     if (user) {
         // 상단 계정 정보(이름, 사진) 표시
         if (infoArea) {
+            infoArea.style.display = 'flex';
             infoArea.innerHTML = `
                 <img src="${user.photoURL || '/image/hssh_Logo.png'}" alt="프로필" style="width:56px;height:56px;border-radius:50%;background:#ececec;object-fit:cover;margin-bottom:8px;" />
                 <div style="font-size:1.1rem;font-weight:600;color:#72d1ff;margin-top:6px;">${user.displayName || user.email}</div>
@@ -23,7 +24,10 @@ function renderMypageUserBox(user) {
         };
         box.style.display = 'flex';
     } else {
-        if (infoArea) infoArea.innerHTML = '';
+        if (infoArea) {
+            infoArea.innerHTML = '';
+            infoArea.style.display = 'none';
+        }
         box.innerHTML = "";
         box.style.display = 'none';
     }
@@ -31,10 +35,44 @@ function renderMypageUserBox(user) {
 document.addEventListener("DOMContentLoaded", function () {
     // Firebase auth가 window에 없으면 script.js가 로드되기 전이므로 대기
     function waitForAuthAndInit() {
-        if (!window.auth) {
+        // Firebase SDK가 window.firebase로 로드됐는지 체크 (CDN 환경 대응)
+        if (typeof window.firebase === 'undefined') {
             setTimeout(waitForAuthAndInit, 50);
             return;
         }
+        // Firebase 초기화 (script.js 미참조, mypage.js 단독 동작)
+        if (!window.firebase.apps.length) {
+            window.firebase.initializeApp({
+                apiKey: "AIzaSyAvdeqqvTeRv_xLGW7CKllR156ZrXP45-g",
+                authDomain: "hssh-meal.firebaseapp.com",
+                projectId: "hssh-meal"
+            });
+        }
+        if (!window.auth) {
+            window.auth = window.firebase.auth();
+            window.provider = new window.firebase.auth.GoogleAuthProvider();
+            window.provider.setCustomParameters({ hd: 'hansung-sh.hs.kr' });
+            window.signIn = function() {
+                window.auth.signInWithPopup(window.provider)
+                    .then(result => {
+                        const email = result.user.email;
+                        if (!email.endsWith('@hansung-sh.hs.kr')) {
+                            window.auth.currentUser.delete().catch(err => console.error('계정 삭제 실패:', err));
+                            window.auth.signOut();
+                            alert('한성과학고(@hansung-sh.hs.kr) 계정만 로그인 가능합니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('인증 실패:', error);
+                        alert('인증 실패: ' + error.message);
+                    });
+            };
+        }
+        // auth 상태 동기화 (최초 진입 시 강제 트리거)
+        window.auth.onAuthStateChanged(function (user) {
+            syncHeaderAuth(user);
+            renderMypageUserBox(user);
+        });
         // 로고 클릭 시 메인으로 이동
         document.querySelectorAll(".logo").forEach(function (logo) {
             logo.style.cursor = "pointer";
@@ -61,20 +99,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('login-btn').onclick = function() {
             if (window.signIn) {
                 window.signIn();
-            } else if (window.auth && window.provider) {
-                window.auth.signInWithPopup(window.provider)
-                    .then(result => {
-                        const email = result.user.email;
-                        if (!email.endsWith('@hansung-sh.hs.kr')) {
-                            window.auth.currentUser.delete().catch(err => console.error('계정 삭제 실패:', err));
-                            window.auth.signOut();
-                            alert('한성과학고(@hansung-sh.hs.kr) 계정만 로그인 가능합니다.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('인증 실패:', error);
-                        alert('인증 실패: ' + error.message);
-                    });
             }
         };
         document.getElementById('signout-btn').onclick = function() {
@@ -85,16 +109,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 window.location.href = '/mypage.html';
             }
         };
-        // auth 상태 동기화
-        if (window.auth && window.auth.currentUser) {
-            syncHeaderAuth(window.auth.currentUser);
-            renderMypageUserBox(window.auth.currentUser);
-        } else {
-            window.auth.onAuthStateChanged(function (user) {
-                syncHeaderAuth(user);
-                renderMypageUserBox(user);
-            });
-        }
         // 계정 삭제 버튼 이벤트
         document
             .getElementById("delete-account-btn")

@@ -22,44 +22,11 @@
         </header>
         <main>
             <section style="max-width: 400px; margin: 60px auto 0">
-                <h2 style="text-align: center">내 정보</h2>
-                <div
-                    id="mypage-account-info"
-                    style="
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        margin-top: 24px;
-                        margin-bottom: 12px;
-                    "
-                ></div>
-                <div
-                    class="user-info-box"
-                    style="
-                        background: #1f233e;
-                        padding: 32px 24px;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-                        margin-top: 12px;
-                        text-align: center;
-                    "
-                >
-                    <div
-                        id="mypage-userbox"
-                        style="
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            gap: 12px;
-                            margin-bottom: 24px;
-                        "
-                    ></div>
-                    <button
-                        id="delete-account-btn"
-                        class="btn"
-                        style="background: #ff4d4f; color: #fff"
-                    >
+                <h2 class="mypage-title">내 정보</h2>
+                <div id="mypage-account-info"></div>
+                <div class="user-info-box">
+                    <div id="mypage-userbox"></div>
+                    <button id="delete-account-btn" class="btn">
                         계정 삭제
                     </button>
                 </div>
@@ -68,7 +35,6 @@
         <footer>
             <p>© 2025 이동하. All Rights Reserved.</p>
         </footer>
-        <script src="script.js"></script>
         <script src="mypage.js"></script>
     </body>
 </html>
