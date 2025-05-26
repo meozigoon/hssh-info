@@ -4,9 +4,9 @@
   "display": "fullscreen",
   "icons": [
     {
-      "src": "/image/hssh_Logo_192.png",
+      "src": "/image/hssh_Logo_512.png",
       "type": "image/x-icon",
-      "sizes": "481x481"
+      "sizes": "512x512"
     }
   ]
 }
