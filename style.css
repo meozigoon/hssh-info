@@ -52,6 +52,7 @@ header {
     position: absolute;
     right: 24px;
     display: flex;
+    flex-direction: row;
     gap: 10px;
     align-items: center;
     justify-content: flex-end;
