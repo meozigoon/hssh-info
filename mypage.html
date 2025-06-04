@@ -39,5 +39,23 @@
             <p>© 2025 이동하. All Rights Reserved.</p>
         </footer>
         <script src="mypage.js"></script>
+        <script>
+            // 로그인 상태가 아니면 메인 페이지로 리다이렉트
+            document.addEventListener("DOMContentLoaded", function () {
+                // Firebase SDK가 로드될 때까지 대기
+                function waitForFirebaseAuth() {
+                    if (typeof firebase === "undefined" || !firebase.auth) {
+                        setTimeout(waitForFirebaseAuth, 50);
+                        return;
+                    }
+                    firebase.auth().onAuthStateChanged(function (user) {
+                        if (!user) {
+                            window.location.href = "/";
+                        }
+                    });
+                }
+                waitForFirebaseAuth();
+            });
+        </script>
     </body>
 </html>
