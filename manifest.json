@@ -1,6 +1,6 @@
 {
   "name": "hssh-meal",
-  "start_url": "/",
+  "start_url": "/index.html",
   "display": "fullscreen",
   "icons": [
     {
