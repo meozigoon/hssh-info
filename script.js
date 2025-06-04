@@ -103,8 +103,6 @@ function fetchAndDisplayMeal() {
 dateInput.addEventListener('change', fetchAndDisplayMeal);
 window.addEventListener('DOMContentLoaded', fetchAndDisplayMeal);
 
-
-// ===== 학교 행사 정보 =====
 const eventApiKey = '2d4a22c414504fe9ba434a810d3c64f1';
 const schoolCode  = '7010115';
 
@@ -170,8 +168,12 @@ function renderEventCalendar(year, month, events) {
             if ((i === 0 && j < startDay) || day > lastDate) {
                 html += '<td></td>';
             } else {
-                const isToday = (year === todayY && month === todayM && day === todayD);
-                html += `<td${isToday ? ' class="today"' : ''}><div style="font-weight:bold;">${day}</div>`;
+                // 오늘 강조
+                let tdClass = '';
+                if (year === todayY && month === todayM && day === todayD) {
+                    tdClass = 'today';
+                }
+                html += `<td${tdClass ? ` class="${tdClass}"` : ''}><div style="font-weight:bold;">${day}</div>`;
                 (events.filter(ev => parseInt(ev.AA_YMD.slice(6,8),10) === day) || []).forEach(ev => {
                     html += `<div style="background:#72d1ff;color:#1f233e;border-radius:4px;padding:2px 3px;margin-top:4px;font-size:0.85em;">${ev.EVENT_NM}</div>`;
                 });
