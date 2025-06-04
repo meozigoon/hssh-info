@@ -1,4 +1,3 @@
-// ===== Firebase 초기화 =====
 const firebaseConfig = {
     apiKey: "AIzaSyAvdeqqvTeRv_xLGW7CKllR156ZrXP45-g",
     authDomain: "hssh-meal.firebaseapp.com",
@@ -11,22 +10,17 @@ const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ hd: 'hansung-sh.hs.kr' });
 
 const loginBtn    = document.getElementById('login-btn');
-// 회원가입 버튼 제거
-// const signupBtn   = document.getElementById('signup-btn');
 const signoutBtn  = document.getElementById('signout-btn');
 const userEmailEl = document.getElementById('user-email');
 
 auth.onAuthStateChanged(user => {
     if (user) {
-        // 프로필 이미지와 이메일 함께 표시
         userEmailEl.innerHTML = `<img src="${user.photoURL || '/image/hssh_Logo.png'}" alt="프로필" />${user.email}`;
         loginBtn.style.display   = 'none';
-        // signupBtn.style.display  = 'none';
         signoutBtn.style.display = 'inline-block';
     } else {
         userEmailEl.innerHTML      = '';
         loginBtn.style.display    = 'inline-block';
-        // signupBtn.style.display   = 'inline-block';
         signoutBtn.style.display  = 'none';
     }
 });
@@ -48,7 +42,6 @@ function signIn() {
 }
 
 loginBtn.addEventListener('click', signIn);
-// signupBtn.addEventListener('click', signIn);
 signoutBtn.addEventListener('click', () => auth.signOut());
 userEmailEl.addEventListener('click', () => {
     if (auth.currentUser) {
@@ -56,7 +49,6 @@ userEmailEl.addEventListener('click', () => {
     }
 });
 
-// ===== 급식 정보 로딩 =====
 const dateInput = document.getElementById('meal-date');
 function setTodayToInput(input) {
     const now = new Date();
@@ -122,25 +114,20 @@ window.addEventListener('DOMContentLoaded', () => {
     const eventList       = document.getElementById('event-list');
     if (!eventMonthInput || !toggleBtn) return;
 
-    // 오늘 기준 연·월 설정
     const now = new Date();
     eventMonthInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
-    // 행사 목록 기본적으로 숨김
     eventList.style.display = 'none';
     toggleBtn.textContent   = '행사 목록 보기';
 
-    // 초기 데이터 로드
     fetchAndDisplayEvents();
 
-    // 행사 목록 토글
     toggleBtn.addEventListener('click', () => {
         const isVisible = eventList.style.display === 'block';
         eventList.style.display = isVisible ? 'none' : 'block';
         toggleBtn.textContent   = isVisible ? '행사 목록 보기' : '행사 목록 숨기기';
     });
 
-    // 월 변경 시 재조회
     eventMonthInput.addEventListener('change', fetchAndDisplayEvents);
 });
 
@@ -155,7 +142,6 @@ async function fetchSchoolEvents(year, month) {
     try {
         const res  = await fetch(url);
         const data = await res.json();
-        // 해당 월의 일정만 필터링
         const rows = data?.SchoolSchedule?.[1]?.row || [];
         return rows.filter(ev => ev.AA_YMD && ev.AA_YMD.startsWith(`${year}${monthStr}`) && ev.EVENT_NM && ev.EVENT_NM.trim() !== '');
     } catch (err) {
@@ -217,7 +203,6 @@ async function fetchAndDisplayEvents() {
     }
 }
 
-// 로그인 상태가 아니면 mypage.html 접근 시 첫 페이지로 리다이렉트
 if (window.location.pathname.endsWith('/mypage.html')) {
     auth.onAuthStateChanged(user => {
         if (!user) {
