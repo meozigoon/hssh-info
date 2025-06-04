@@ -126,9 +126,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const now = new Date();
     eventMonthInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
-    // 행사 목록 기본적으로 보이기
-    eventList.style.display = 'block';
-    toggleBtn.textContent   = '행사 목록 숨기기';
+    // 행사 목록 기본적으로 숨김
+    eventList.style.display = 'none';
+    toggleBtn.textContent   = '행사 목록 보기';
 
     // 초기 데이터 로드
     fetchAndDisplayEvents();
