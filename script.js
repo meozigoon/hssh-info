@@ -219,11 +219,13 @@ document.querySelectorAll('.logo').forEach(function(logo) {
 });
 
 (function () {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register('/sw.js').then(function (registration) {
-        console.log(registration);
-      }, function (err) {
-        console.log(err)
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => {
+        console.log('Service Worker 등록 성공:', reg);
+      })
+      .catch(err => {
+        console.error('Service Worker 등록 실패:', err);
       });
-    }
+  }
   })();
