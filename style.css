@@ -348,3 +348,43 @@ section > h2 {
 #delete-account-btn:hover {
     background: #d9363e;
 }
+
+/* 시간표 전체 카드(박스) 스타일을 별도 정의 */
+.timetable-wide-card {
+  width: 100%;
+  min-width: 700px;
+  max-width: 900px;
+  margin: 0 auto 32px auto;
+  background: #181e2a;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.13);
+  padding: 32px 24px 32px 24px;
+  overflow-x: auto;
+}
+
+.weekly-timetable {
+  min-width: 600px;
+  width: 100%;
+  max-width: none;
+  table-layout: fixed;
+  text-align: center;
+  border-collapse: collapse;
+}
+
+.weekly-timetable th, .weekly-timetable td {
+  min-width: 90px;
+  height: 48px;
+  background: #222;
+  color: #ececec;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  font-size: 1.01rem;
+}
+
+.weekly-timetable th {
+  color: #72d1ff;
+  font-weight: 600;
+  background: #222;
+}

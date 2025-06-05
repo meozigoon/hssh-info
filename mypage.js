@@ -144,3 +144,108 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     waitForAuthAndInit();
 });
+// 계정 이름에서 학년/반 추출
+function getGradeClassFromName(name) {
+    if (!name || name.length < 2) return { grade: '', classNum: '' };
+    const grade = name[0];
+    const classNum = name[1];
+    return { grade, classNum };
+}
+
+// 주간 시간표를 달력형 표로 표시
+async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
+    const apiKey = 'a20b10c46deb473eb5eb936d53e64ce2';
+    const proxy = 'https://corsproxy.io/?';
+    const today = new Date();
+    // 이번 주 월요일~금요일 날짜 구하기
+    const dayOfWeek = today.getDay(); // 0(일)~6(토)
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+    const weekDates = [];
+    for (let i = 0; i < 5; i++) { // 월~금
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        weekDates.push(d);
+    }
+    // 날짜별로 시간표 요청
+    const ymdArr = weekDates.map(d => {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}${mm}${dd}`;
+    });
+    const fromYmd = ymdArr[0];
+    const toYmd = ymdArr[4];
+    const url = proxy + encodeURIComponent(
+        `https://open.neis.go.kr/hub/hisTimetable?ATPT_OFCDC_SC_CODE=B10&SD_SCHUL_CODE=7010115&GRADE=${grade}&CLASS_NM=${classNum}&TI_FROM_YMD=${fromYmd}&TI_TO_YMD=${toYmd}&Type=json&KEY=${apiKey}`
+    );
+    timetableBox.innerHTML = '<div style="text-align:center;">전체 시간표 불러오는 중...</div>';
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const rows = data?.hisTimetable?.[1]?.row || [];
+        if (rows.length === 0) {
+            timetableBox.innerHTML = '<div style="text-align:center;margin-top:18px;">이번 주 시간표가 없습니다.</div>';
+            return;
+        }
+        // 요일별, 교시별로 정렬
+        const days = ['월', '화', '수', '목', '금'];
+        const dayMap = {};
+        days.forEach((d, i) => {
+            const ymd = ymdArr[i];
+            dayMap[ymd] = {};
+        });
+        let maxPeriod = 0;
+        rows.forEach(r => {
+            const ymd = r.ALL_TI_YMD;
+            const period = parseInt(r.PERIO, 10);
+            if (!dayMap[ymd]) dayMap[ymd] = {};
+            dayMap[ymd][period] = r.ITRT_CNTNT || r.SUBJECT_NM || '-';
+            if (period > maxPeriod) maxPeriod = period;
+        });
+        // 표 생성
+        let html = '<div class="timetable-wide-card"><div style="font-weight:600;font-size:1.08rem;margin-bottom:8px;text-align:center;color:#72d1ff;">이번 주 전체 시간표</div>';
+        html += '<div style="overflow-x:auto;"><table class="weekly-timetable">';
+        html += '<thead><tr><th>교시</th>';
+        days.forEach(d => {
+            html += `<th>${d}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+        for (let period = 1; period <= maxPeriod; period++) {
+            html += `<tr><td>${period}</td>`;
+            for (let i = 0; i < 5; i++) {
+                const ymd = ymdArr[i];
+                const subject = (dayMap[ymd][period] || '-');
+                html += `<td>${subject}</td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table></div></div>';
+        timetableBox.innerHTML = html;
+    } catch (e) {
+        timetableBox.innerHTML = '<div style="text-align:center;color:#ff4d4f;margin-top:18px;">주간 시간표 불러오기 실패</div>';
+    }
+}
+
+// mypage 진입 시 계정 이름에서 학년/반 추출 후 전체 시간표 표시
+window.addEventListener('DOMContentLoaded', function() {
+    window.auth.onAuthStateChanged(function(user) {
+        if (!user) return;
+        const name = user.displayName || '';
+        const { grade, classNum } = getGradeClassFromName(name);
+        if (grade && classNum) {
+            // 전체 시간표 박스 생성 및 렌더링
+            let section = document.querySelector('main section');
+            if (!section) return;
+            let timetableBoxBottom = document.getElementById('timetable-box-bottom');
+            if (!timetableBoxBottom) {
+                timetableBoxBottom = document.createElement('div');
+                timetableBoxBottom.id = 'timetable-box-bottom';
+                timetableBoxBottom.className = 'user-info-box';
+                timetableBoxBottom.style.marginTop = '24px';
+                section.appendChild(timetableBoxBottom);
+            }
+            fetchAndShowWeeklyTimetable(grade, classNum, timetableBoxBottom);
+        }
+    });
+});
