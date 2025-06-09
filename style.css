@@ -106,9 +106,11 @@ header {
     margin-left: 0;
     margin-right: 0;
 }
+
 #user-email {
     order: 1;
 }
+
 #signout-btn {
     order: 3;
 }
@@ -302,6 +304,7 @@ section > h2 {
     margin-top: 24px;
     margin-bottom: 12px;
 }
+
 #mypage-account-info img {
     width: 56px;
     height: 56px;
@@ -310,12 +313,14 @@ section > h2 {
     object-fit: cover;
     margin-bottom: 8px;
 }
+
 #mypage-account-info .mypage-name {
     font-size: 1.1rem;
     font-weight: 600;
     color: #72d1ff;
     margin-top: 6px;
 }
+
 #mypage-account-info .mypage-email {
     font-size: 0.98rem;
     color: #ececec;
@@ -329,6 +334,7 @@ section > h2 {
     margin-top: 12px;
     text-align: center;
 }
+
 #mypage-userbox {
     display: flex;
     align-items: center;
@@ -336,20 +342,22 @@ section > h2 {
     gap: 12px;
     margin-bottom: 24px;
 }
+
 #mypage-signout-btn {
     margin-left: 10px;
 }
+
 #delete-account-btn {
     background: #ff4d4f;
     color: #fff;
     margin-top: 8px;
     transition: background 0.2s;
 }
+
 #delete-account-btn:hover {
     background: #d9363e;
 }
 
-/* 시간표 전체 카드(박스) 스타일을 별도 정의 */
 .timetable-wide-card {
   width: 100%;
   min-width: 700px;
@@ -364,12 +372,11 @@ section > h2 {
 
 .weekly-timetable {
   min-width: 600px;
-  width: auto;
+  width: 100%;
   max-width: none;
   table-layout: fixed;
   text-align: center;
   border-collapse: collapse;
-  margin: 0 auto;
 }
 
 .weekly-timetable th, .weekly-timetable td {
@@ -393,14 +400,15 @@ section > h2 {
 .exam-dday-box {
     width: 100%;
     max-width: 1200px;
-    margin: 24px auto 0 auto; /* 위/아래 여백을 더 줄임 */
-    padding: 16px 0 4px 0;   /* 패딩도 최소화 */
+    margin: 24px auto 0 auto;
+    padding: 16px 0 4px 0;
     text-align: center;
     background: #ffffff;
     border-radius: 18px;
     box-shadow: 0 4px 24px rgba(255, 179, 0, 0.13);
     border: 2px solid #72d1ff;
 }
+
 .exam-dday-label {
     font-size: 2.5rem;
     font-weight: 800;
@@ -408,11 +416,12 @@ section > h2 {
     letter-spacing: 2px;
     text-shadow: 0 2px 8px #fffbe6, 0 1px 0 #fff;
 }
+
 .exam-dday-date {
     display: block;
     margin-top: 4px;
     font-size: 1.02rem;
-    color: #9f00bf;
+    color: #ff00d9;
     font-weight: 500;
     letter-spacing: 0.5px;
 }
