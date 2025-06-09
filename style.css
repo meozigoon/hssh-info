@@ -396,32 +396,3 @@ section > h2 {
   font-weight: 600;
   background: #222;
 }
-
-.exam-dday-box {
-    width: 100%;
-    max-width: 1200px;
-    margin: 24px auto 0 auto;
-    padding: 16px 0 4px 0;
-    text-align: center;
-    background: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 4px 24px rgba(255, 179, 0, 0.13);
-    border: 2px solid #72d1ff;
-}
-
-.exam-dday-label {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #ff00d9;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 8px #fffbe6, 0 1px 0 #fff;
-}
-
-.exam-dday-date {
-    display: block;
-    margin-top: 4px;
-    font-size: 1.02rem;
-    color: #ff00d9;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}

@@ -231,24 +231,3 @@ document.querySelectorAll('.logo').forEach(function(logo) {
       });
   }
   })();
-
-window.addEventListener('DOMContentLoaded', function() {
-    const FINAL_EXAM_DATE = new Date(2025, 5, 30);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const diff = Math.ceil((FINAL_EXAM_DATE - today) / (1000*60*60*24));
-    const label = document.getElementById('exam-dday-label');
-    const dateLabel = document.getElementById('exam-dday-date');
-    if (label) {
-        if (diff > 0) {
-            label.textContent = `시험 D-${diff}`;
-        } else if (diff === 0) {
-            label.textContent = '시험 D-DAY';
-        } else {
-            label.textContent = `시험 D+${Math.abs(diff)} 경과`;
-        }
-    }
-    if (dateLabel) {
-        dateLabel.textContent = `2025-06-30`;
-    }
-});
