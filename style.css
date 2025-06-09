@@ -364,11 +364,12 @@ section > h2 {
 
 .weekly-timetable {
   min-width: 600px;
-  width: 100%;
+  width: auto;
   max-width: none;
   table-layout: fixed;
   text-align: center;
   border-collapse: collapse;
+  margin: 0 auto;
 }
 
 .weekly-timetable th, .weekly-timetable td {
