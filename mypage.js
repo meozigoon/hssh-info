@@ -162,7 +162,7 @@ async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
     const monday = new Date(today);
     monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
     const weekDates = [];
-    for (let i = 0; i < 5; i++) { // 월~금
+    for (let i = 7; i < 12; i++) { // 월~금
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
         weekDates.push(d);
