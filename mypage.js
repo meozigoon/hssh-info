@@ -160,7 +160,7 @@ async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
     // 이번 주 월요일~금요일 날짜 구하기
     const dayOfWeek = today.getDay(); // 0(일)~6(토)
     const monday = new Date(today);
-    monday.setDate(today.getDate() - ((dayOfWeek + 13) % 7));
+    monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
     const weekDates = [];
     for (let i = 0; i < 5; i++) { // 월~금
         const d = new Date(monday);
