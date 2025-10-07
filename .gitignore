@@ -1,0 +1,5 @@
+.env
+.env.*
+env.js
+.vercel
+.env*.local
