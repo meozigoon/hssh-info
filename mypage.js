@@ -1,6 +1,6 @@
 const inlineEnvConfig = window.__ENV__ || null;
 let resolvedConfig = null;
-let neisTimetableApiKey = config.neisTimetableApiKey;
+let neisTimetableApiKey = "";
 let authListenerAttached = false;
 
 function renderMypageUserBox(user) {
@@ -324,19 +324,13 @@ async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    (async function initMypage() {
-        try {
-            const config = await resolveAppConfig();
-            neisTimetableApiKey = config.neisTimetableApiKey;
-            ("");
-            await ensureFirebaseAuth(config);
-            setupHeaderActions();
-            attachAuthListener();
-        } catch (error) {
-            console.error("마이페이지 초기화 실패:", error);
-            alert(
-                "서비스 설정을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요."
-            );
-        }
-    })();
+    const message = "현재 이용하실 수 없습니다.";
+    const infoArea = document.getElementById("mypage-account-info");
+    if (infoArea) {
+        infoArea.style.display = "flex";
+        infoArea.innerHTML =
+            '<div style="width:100%;text-align:center;color:#ff4d4f;font-weight:600;">현재 이용하실 수 없습니다.</div>';
+    }
+    alert(message);
+    window.location.replace("/");
 });
