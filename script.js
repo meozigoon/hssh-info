@@ -2,7 +2,7 @@ let auth;
 let provider;
 let neisMealApiKey = "";
 let neisEventApiKey = "";
-const schoolCode = "7010115";
+const schoolCode = "7010547";
 const inlineEnvConfig = window.__ENV__ || null;
 
 const loginBtn = document.getElementById("login-btn");
