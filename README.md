@@ -15,7 +15,8 @@ window.__ENV__ = {
   },
   allowedDomain: 'hansung-sh.hs.kr',
   neisMealApiKey: 'YOUR_NEIS_MEAL_API_KEY',
-  neisEventApiKey: 'YOUR_NEIS_EVENT_API_KEY'
+  neisEventApiKey: 'YOUR_NEIS_EVENT_API_KEY',
+  neisTimetableApiKey: 'YOUR_NEIS_TIMETABLE_API_KEY'
 };
 ```
 
@@ -31,5 +32,6 @@ Vercel 대시보드 > 프로젝트 > Settings > Environment Variables 에 다음
 | `ALLOWED_LOGIN_DOMAIN` | 허용할 Google Workspace 도메인 (예: `hansung-sh.hs.kr`) |
 | `NEIS_MEAL_API_KEY` | NEIS 급식 API 키 |
 | `NEIS_EVENT_API_KEY` | NEIS 학사일정 API 키 |
+| `NEIS_TIMETABLE_API_KEY` | NEIS 시간표 API 키 |
 
 모든 값을 저장한 뒤 다시 배포하면 `/api/config` 함수가 해당 값을 프론트엔드에 전달합니다.

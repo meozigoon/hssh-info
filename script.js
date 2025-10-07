@@ -330,6 +330,7 @@ async function initApp() {
         }
     }
 
+    window.__APP_CONFIG__ = config;
     try {
         firebase.initializeApp(config.firebaseConfig);
     } catch (firebaseError) {
@@ -343,6 +344,9 @@ async function initApp() {
     if (config.allowedDomain) {
         provider.setCustomParameters({ hd: config.allowedDomain });
     }
+    window.auth = auth;
+    window.provider = provider;
+    window.signIn = signIn;
     neisMealApiKey = config.neisMealApiKey || "";
     neisEventApiKey = config.neisEventApiKey || "";
 

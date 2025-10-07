@@ -10,6 +10,7 @@ module.exports = (req, res) => {
     allowedDomain: process.env.ALLOWED_LOGIN_DOMAIN || 'hansung-sh.hs.kr',
     neisMealApiKey: process.env.NEIS_MEAL_API_KEY,
     neisEventApiKey: process.env.NEIS_EVENT_API_KEY,
+    neisTimetableApiKey: process.env.NEIS_TIMETABLE_API_KEY,
   };
 
   if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {

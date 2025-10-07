@@ -1,6 +1,13 @@
+const inlineEnvConfig = window.__ENV__ || null;
+let resolvedConfig = null;
+let neisTimetableApiKey = '';
+let authListenerAttached = false;
+
 function renderMypageUserBox(user) {
     const box = document.getElementById("mypage-userbox");
     const infoArea = document.getElementById("mypage-account-info");
+    if (!box) return;
+
     if (user) {
         if (infoArea) {
             infoArea.style.display = 'flex';
@@ -11,139 +18,179 @@ function renderMypageUserBox(user) {
             `;
         }
         box.innerHTML = `<span class="user-email" style="text-decoration:underline;text-underline-position:under;color:#72d1ff;cursor:pointer;gap:6px;display:flex;align-items:center;">
-            <img src="${user.photoURL || "/image/hssh_Logo.png"}" alt="프로필" style="width:28px;height:28px;border-radius:50%;background:#ececec;object-fit:cover;margin-right:4px;" />
+            <img src="${user.photoURL || '/image/hssh_Logo.png'}" alt="프로필" style="width:28px;height:28px;border-radius:50%;background:#ececec;object-fit:cover;margin-right:4px;" />
             ${user.email}
         </span>
         <button id="mypage-signout-btn" class="btn" style="margin-left:10px;">로그아웃</button>`;
-        document.getElementById("mypage-signout-btn").onclick = function () {
-            window.auth.signOut().then(() => (window.location.href = "/"));
-        };
+        const signoutBtn = document.getElementById("mypage-signout-btn");
+        if (signoutBtn) {
+            signoutBtn.onclick = function () {
+                window.auth?.signOut().then(() => (window.location.href = "/"));
+            };
+        }
         box.style.display = 'flex';
     } else {
         if (infoArea) {
             infoArea.innerHTML = '';
             infoArea.style.display = 'none';
         }
-        box.innerHTML = "";
+        box.innerHTML = '';
         box.style.display = 'none';
     }
 }
-document.addEventListener("DOMContentLoaded", function () {
-    function waitForAuthAndInit() {
-        if (typeof window.firebase === 'undefined') {
-            setTimeout(waitForAuthAndInit, 50);
+
+function syncHeaderAuth(user) {
+    const loginBtn = document.getElementById('login-btn');
+    const signoutBtn = document.getElementById('signout-btn');
+    const userEmailEl = document.getElementById('user-email');
+    if (!loginBtn || !signoutBtn || !userEmailEl) return;
+
+    if (user) {
+        userEmailEl.innerHTML = `<img src="${user.photoURL || '/image/hssh_Logo.png'}" alt="프로필" />${user.email}`;
+        loginBtn.style.display = 'none';
+        signoutBtn.style.display = 'inline-block';
+    } else {
+        userEmailEl.innerHTML = '';
+        loginBtn.style.display = 'inline-block';
+        signoutBtn.style.display = 'none';
+    }
+}
+
+function setupHeaderActions() {
+    document.querySelectorAll('.logo').forEach(function (logo) {
+        logo.style.cursor = 'pointer';
+        logo.onclick = function () {
+            window.location.href = '/';
+        };
+    });
+
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        loginBtn.onclick = function () {
+            if (typeof window.signIn === 'function') {
+                window.signIn();
+            } else {
+                alert('로그인 구성이 아직 완료되지 않았습니다. 잠시 후 다시 시도해주세요.');
+            }
+        };
+    }
+
+    const signoutBtn = document.getElementById('signout-btn');
+    if (signoutBtn) {
+        signoutBtn.onclick = function () {
+            window.auth?.signOut();
+        };
+    }
+
+    const userEmailEl = document.getElementById('user-email');
+    if (userEmailEl) {
+        userEmailEl.onclick = function () {
+            if (window.auth?.currentUser) {
+                window.location.href = '/mypage.html';
+            }
+        };
+    }
+}
+
+function waitForFirebase() {
+    return new Promise(function (resolve, reject) {
+        let attempts = 0;
+        const maxAttempts = 200; // 약 10초
+        function check() {
+            if (typeof window.firebase !== 'undefined') {
+                resolve(window.firebase);
+                return;
+            }
+            attempts += 1;
+            if (attempts > maxAttempts) {
+                reject(new Error('Firebase SDK를 찾을 수 없습니다.')); // eslint-disable-line prefer-promise-reject-errors
+                return;
+            }
+            setTimeout(check, 50);
+        }
+        check();
+    });
+}
+
+async function resolveAppConfig() {
+    if (resolvedConfig) {
+        return resolvedConfig;
+    }
+    if (window.__APP_CONFIG__) {
+        resolvedConfig = window.__APP_CONFIG__;
+        return resolvedConfig;
+    }
+    if (inlineEnvConfig) {
+        resolvedConfig = inlineEnvConfig;
+        window.__APP_CONFIG__ = resolvedConfig;
+        return resolvedConfig;
+    }
+    const res = await fetch('/api/config');
+    if (!res.ok) {
+        throw new Error(`Failed to load config: ${res.status}`);
+    }
+    const data = await res.json();
+    window.__APP_CONFIG__ = data;
+    resolvedConfig = data;
+    return data;
+}
+
+async function ensureFirebaseAuth(config) {
+    const firebase = await waitForFirebase();
+    if (!firebase.apps.length) {
+        firebase.initializeApp(config.firebaseConfig);
+    }
+    if (!window.auth) {
+        window.auth = firebase.auth();
+    }
+    if (!window.provider) {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        if (config.allowedDomain) {
+            provider.setCustomParameters({ hd: config.allowedDomain });
+        }
+        window.provider = provider;
+    }
+    window.signIn = async function () {
+        if (!window.auth || !window.provider) {
+            alert('로그인 구성이 아직 완료되지 않았습니다. 잠시 후 다시 시도해주세요.');
             return;
         }
-        if (!window.firebase.apps.length) {
-            window.firebase.initializeApp({
-                apiKey: "AIzaSyAvdeqqvTeRv_xLGW7CKllR156ZrXP45-g",
-                authDomain: "hssh-meal.firebaseapp.com",
-                projectId: "hssh-meal"
-            });
+        try {
+            const result = await window.auth.signInWithPopup(window.provider);
+            const email = result.user.email;
+            const allowedDomain = config.allowedDomain;
+            if (allowedDomain && !email.endsWith(`@${allowedDomain}`)) {
+                await window.auth.currentUser?.delete().catch(function (err) {
+                    console.error('계정 삭제 실패:', err);
+                });
+                await window.auth.signOut();
+                alert(`${allowedDomain} 계정만 로그인 가능합니다.`);
+            }
+        } catch (error) {
+            console.error('인증 실패:', error);
+            alert('인증 실패: ' + error.message);
         }
-        if (!window.auth) {
-            window.auth = window.firebase.auth();
-            window.provider = new window.firebase.auth.GoogleAuthProvider();
-            window.provider.setCustomParameters({ hd: 'hansung-sh.hs.kr' });
-            window.signIn = function() {
-                window.auth.signInWithPopup(window.provider)
-                    .then(result => {
-                        const email = result.user.email;
-                        if (!email.endsWith('@hansung-sh.hs.kr')) {
-                            window.auth.currentUser.delete().catch(err => console.error('계정 삭제 실패:', err));
-                            window.auth.signOut();
-                            alert('한성과학고(@hansung-sh.hs.kr) 계정만 로그인 가능합니다.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('인증 실패:', error);
-                        alert('인증 실패: ' + error.message);
-                    });
-            };
-        }
-        window.addEventListener('DOMContentLoaded', function() {
-            let first = true;
-            window.auth.onAuthStateChanged(function (user) {
+    };
+}
+
+function attachAuthListener() {
+    if (!window.auth || authListenerAttached) return;
+    authListenerAttached = true;
+    let first = true;
+    window.auth.onAuthStateChanged(function (user) {
+        syncHeaderAuth(user);
+        renderMypageUserBox(user);
+        handleUserTimetable(user);
+        if (first && user) {
+            first = false;
+            setTimeout(function () {
                 syncHeaderAuth(user);
                 renderMypageUserBox(user);
-                if (first && user) {
-                    first = false;
-                    setTimeout(() => {
-                        syncHeaderAuth(user);
-                        renderMypageUserBox(user);
-                    }, 0);
-                }
-            });
-            document.querySelectorAll(".logo").forEach(function (logo) {
-                logo.style.cursor = "pointer";
-                logo.addEventListener("click", function () {
-                    window.location.href = "/";
-                });
-            });
-            function syncHeaderAuth(user) {
-                const loginBtn = document.getElementById('login-btn');
-                const signoutBtn = document.getElementById('signout-btn');
-                const userEmailEl = document.getElementById('user-email');
-                if (user) {
-                    userEmailEl.innerHTML = `<img src="${user.photoURL || '/image/hssh_Logo.png'}" alt="프로필" />${user.email}`;
-                    loginBtn.style.display = 'none';
-                    signoutBtn.style.display = 'inline-block';
-                } else {
-                    userEmailEl.innerHTML = '';
-                    loginBtn.style.display = 'inline-block';
-                    signoutBtn.style.display = 'none';
-                }
-            }
-            document.getElementById('login-btn').onclick = function() {
-                if (window.signIn) {
-                    window.signIn();
-                }
-            };
-            document.getElementById('signout-btn').onclick = function() {
-                if (window.auth) window.auth.signOut();
-            };
-            document.getElementById('user-email').onclick = function() {
-                if (window.auth && window.auth.currentUser) {
-                    window.location.href = '/mypage.html';
-                }
-            };
-            document.getElementById("delete-account-btn").addEventListener("click", function () {
-                if (window.auth && window.auth.currentUser) {
-                    if (
-                        confirm(
-                            "정말로 계정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다."
-                        )
-                    ) {
-                        window.auth.currentUser
-                            .delete()
-                            .then(function () {
-                                alert("계정이 삭제되었습니다. 로그아웃됩니다.");
-                                window.auth.signOut().then(function() {
-                                    window.location.href = "/";
-                                });
-                            })
-                            .catch(function (error) {
-                                if (
-                                    error.code ===
-                                    "auth/requires-recent-login"
-                                ) {
-                                    alert(
-                                        "보안을 위해 다시 로그인 후 계정 삭제를 시도해 주세요."
-                                    );
-                                    window.location.href = "/";
-                                } else {
-                                    alert(
-                                        "계정 삭제 실패: " + error.message
-                                    );
-                                }
-                            });
-                    }
-                }
-            });
-        });
-    }
-    waitForAuthAndInit();
-});
+            }, 0);
+        }
+    });
+}
+
 // 계정 이름에서 학년/반 추출
 function getGradeClassFromName(name) {
     if (!name || name.length < 2) return { grade: '', classNum: '' };
@@ -152,23 +199,51 @@ function getGradeClassFromName(name) {
     return { grade, classNum };
 }
 
+function ensureTimetableContainer() {
+    const section = document.querySelector('main section');
+    if (!section) return null;
+    let timetableBoxBottom = document.getElementById('timetable-box-bottom');
+    if (!timetableBoxBottom) {
+        timetableBoxBottom = document.createElement('div');
+        timetableBoxBottom.id = 'timetable-box-bottom';
+        timetableBoxBottom.className = 'user-info-box';
+        timetableBoxBottom.style.marginTop = '24px';
+        section.appendChild(timetableBoxBottom);
+    }
+    return timetableBoxBottom;
+}
+
+function handleUserTimetable(user) {
+    if (!user) return;
+    const name = user.displayName || '';
+    const { grade, classNum } = getGradeClassFromName(name);
+    if (grade && classNum) {
+        const timetableBox = ensureTimetableContainer();
+        if (timetableBox) {
+            fetchAndShowWeeklyTimetable(grade, classNum, timetableBox);
+        }
+    }
+}
+
 // 주간 시간표를 달력형 표로 표시
 async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
-    const apiKey = 'a20b10c46deb473eb5eb936d53e64ce2';
+    if (!neisTimetableApiKey) {
+        timetableBox.innerHTML = '<div style="text-align:center;color:#ff4d4f;margin-top:18px;">시간표 API 키가 설정되지 않았습니다.</div>';
+        console.warn('NEIS 시간표 API 키가 설정되지 않았습니다.');
+        return;
+    }
     const proxy = 'https://corsproxy.io/?';
     const today = new Date();
-    // 이번 주 월요일~금요일 날짜 구하기
     const dayOfWeek = today.getDay(); // 0(일)~6(토)
     const monday = new Date(today);
     monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
     const weekDates = [];
-    for (let i = 0; i < 5; i++) { // 월~금
+    for (let i = 0; i < 5; i++) {
         const d = new Date(monday);
         d.setDate(monday.getDate() + i);
         weekDates.push(d);
     }
-    // 날짜별로 시간표 요청
-    const ymdArr = weekDates.map(d => {
+    const ymdArr = weekDates.map(function (d) {
         const yyyy = d.getFullYear();
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const dd = String(d.getDate()).padStart(2, '0');
@@ -177,7 +252,7 @@ async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
     const fromYmd = ymdArr[0];
     const toYmd = ymdArr[4];
     const url = proxy + encodeURIComponent(
-        `https://open.neis.go.kr/hub/hisTimetable?ATPT_OFCDC_SC_CODE=B10&SD_SCHUL_CODE=7010115&GRADE=${grade}&CLASS_NM=${classNum}&TI_FROM_YMD=${fromYmd}&TI_TO_YMD=${toYmd}&Type=json&KEY=${apiKey}`
+        `https://open.neis.go.kr/hub/hisTimetable?ATPT_OFCDC_SC_CODE=B10&SD_SCHUL_CODE=7010115&GRADE=${grade}&CLASS_NM=${classNum}&TI_FROM_YMD=${fromYmd}&TI_TO_YMD=${toYmd}&Type=json&KEY=${neisTimetableApiKey}`
     );
     timetableBox.innerHTML = '<div style="text-align:center;">전체 시간표 불러오는 중...</div>';
     try {
@@ -188,26 +263,24 @@ async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
             timetableBox.innerHTML = '<div style="text-align:center;margin-top:18px;">이번 주 시간표가 없습니다.</div>';
             return;
         }
-        // 요일별, 교시별로 정렬
         const days = ['월', '화', '수', '목', '금'];
         const dayMap = {};
-        days.forEach((d, i) => {
+        days.forEach(function (_, i) {
             const ymd = ymdArr[i];
             dayMap[ymd] = {};
         });
         let maxPeriod = 0;
-        rows.forEach(r => {
+        rows.forEach(function (r) {
             const ymd = r.ALL_TI_YMD;
             const period = parseInt(r.PERIO, 10);
             if (!dayMap[ymd]) dayMap[ymd] = {};
             dayMap[ymd][period] = r.ITRT_CNTNT || r.SUBJECT_NM || '-';
             if (period > maxPeriod) maxPeriod = period;
         });
-        // 표 생성
         let html = '<div class="timetable-wide-card"><div style="font-weight:600;font-size:1.08rem;margin-bottom:8px;text-align:center;color:#72d1ff;">이번 주 전체 시간표</div>';
         html += '<div style="overflow-x:auto;"><table class="weekly-timetable">';
         html += '<thead><tr><th>교시</th>';
-        days.forEach(d => {
+        days.forEach(function (d) {
             html += `<th>${d}</th>`;
         });
         html += '</tr></thead><tbody>';
@@ -215,7 +288,7 @@ async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
             html += `<tr><td>${period}</td>`;
             for (let i = 0; i < 5; i++) {
                 const ymd = ymdArr[i];
-                const subject = (dayMap[ymd][period] || '-');
+                const subject = dayMap[ymd][period] || '-';
                 html += `<td>${subject}</td>`;
             }
             html += '</tr>';
@@ -223,29 +296,22 @@ async function fetchAndShowWeeklyTimetable(grade, classNum, timetableBox) {
         html += '</tbody></table></div></div>';
         timetableBox.innerHTML = html;
     } catch (e) {
+        console.error('주간 시간표 불러오기 실패:', e);
         timetableBox.innerHTML = '<div style="text-align:center;color:#ff4d4f;margin-top:18px;">주간 시간표 불러오기 실패</div>';
     }
 }
 
-// mypage 진입 시 계정 이름에서 학년/반 추출 후 전체 시간표 표시
-window.addEventListener('DOMContentLoaded', function() {
-    window.auth.onAuthStateChanged(function(user) {
-        if (!user) return;
-        const name = user.displayName || '';
-        const { grade, classNum } = getGradeClassFromName(name);
-        if (grade && classNum) {
-            // 전체 시간표 박스 생성 및 렌더링
-            let section = document.querySelector('main section');
-            if (!section) return;
-            let timetableBoxBottom = document.getElementById('timetable-box-bottom');
-            if (!timetableBoxBottom) {
-                timetableBoxBottom = document.createElement('div');
-                timetableBoxBottom.id = 'timetable-box-bottom';
-                timetableBoxBottom.className = 'user-info-box';
-                timetableBoxBottom.style.marginTop = '24px';
-                section.appendChild(timetableBoxBottom);
-            }
-            fetchAndShowWeeklyTimetable(grade, classNum, timetableBoxBottom);
+document.addEventListener('DOMContentLoaded', function () {
+    (async function initMypage() {
+        try {
+            const config = await resolveAppConfig();
+            neisTimetableApiKey = config.neisTimetableApiKey || '';
+            await ensureFirebaseAuth(config);
+            setupHeaderActions();
+            attachAuthListener();
+        } catch (error) {
+            console.error('마이페이지 초기화 실패:', error);
+            alert('서비스 설정을 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
         }
-    });
+    })();
 });
